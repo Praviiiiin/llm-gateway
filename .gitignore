@@ -22,3 +22,5 @@ Thumbs.db
 # IDE
 .vscode/*
 !.vscode/extensions.json
+
+/src/generated/prisma
