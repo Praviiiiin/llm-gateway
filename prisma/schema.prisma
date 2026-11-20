@@ -12,7 +12,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 enum ApiKeyStatus {
   ACTIVE
   REVOKED
@@ -26,8 +25,9 @@ model ApiKey {
   status     ApiKeyStatus @default(ACTIVE)
   createdAt  DateTime     @default(now())
   revokedAt  DateTime?
+  expiresAt  DateTime?
+  requests   LlmRequest[]
 }
-
 
 enum ProviderStatus {
   ACTIVE
@@ -35,10 +35,50 @@ enum ProviderStatus {
 }
 
 model LlmProvider {
-  id        String         @id @default(cuid())
-  name      String         @unique
-  baseUrl   String?
-  status    ProviderStatus @default(ACTIVE)
-  createdAt DateTime       @default(now())
+  id             String         @id @default(cuid())
+  name           String         @unique
+  baseUrl        String?
+  status         ProviderStatus @default(ACTIVE)
+  createdAt      DateTime       @default(now())
+  requests       LlmRequest[]   @relation("RequestProvider")
+  cachedRequests LlmRequest[]   @relation("CachedProvider")
 }
 
+enum RequestStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  TIMEOUT
+}
+
+model LlmRequest {
+  id String @id @default(cuid())
+
+  apiKeyId String?
+  apiKey   ApiKey? @relation(fields: [apiKeyId], references: [id])
+
+  providerId String?
+  provider   LlmProvider? @relation("RequestProvider", fields: [providerId], references: [id])
+
+  cachedFromProviderId String?
+  cachedFromProvider   LlmProvider? @relation("CachedProvider", fields: [cachedFromProviderId], references: [id])
+
+  model    String
+  status   RequestStatus @default(PENDING)
+  cacheHit Boolean       @default(false)
+
+  inputTokens   Int      @default(0)
+  outputTokens  Int      @default(0)
+  estimatedCost Decimal? @default(0) @db.Decimal(12, 8)
+
+  latencyMs Int?
+  errorCode String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([apiKeyId])
+  @@index([providerId])
+  @@index([status])
+  @@index([createdAt])
+}
