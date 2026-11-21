@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Patch } from '@nestjs/common';
 import { AppService } from './app.service';
 import { LlmRequestsService } from './llm-requests/llm-requests.service';
-import { CreateLlmRequestDto } from './llm-requests/llm-request.dto';
+import { CreateLlmRequestDto } from './llm-requests/dto/llm-request.dto';
+import { UpdateLlmRequestDto } from './llm-requests/dto/update-llm-request.dto';
 
 @Controller()
 export class AppController {
@@ -19,4 +20,14 @@ export class AppController {
   createRequest(@Body() body: CreateLlmRequestDto) {
     return this.llmRequestsService.createPendingRequest(body.model);
   }
+
+  @Post('llm-request/:id')
+  updateRequest(
+    @Param('id') id: string,
+    @Body() body: UpdateLlmRequestDto,
+  ) {
+    return this.llmRequestsService.updateRequest(id, body)
+  }
+
+  
 }
