@@ -21,12 +21,17 @@ export class AppController {
     return this.llmRequestsService.createPendingRequest(body.model);
   }
 
-  @Post('llm-request/:id')
+  @Patch('llm-requests/:id')
   updateRequest(
     @Param('id') id: string,
     @Body() body: UpdateLlmRequestDto,
   ) {
-    return this.llmRequestsService.updateRequest(id, body)
+    return this.llmRequestsService.updateRequest(id, body);
+  }
+
+  @Get('llm-requests/:id')
+  getRequest(@Param('id') id: string) {
+    return this.llmRequestsService.getRequestById(id);
   }
 
   
