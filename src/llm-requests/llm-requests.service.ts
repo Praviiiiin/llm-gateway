@@ -23,4 +23,12 @@ export class LlmRequestsService {
             data: data
         });
     }
+
+    async getRequestById(id: string) {
+        return this.prisma.llmRequest.findUnique({
+            where: {
+                id: id,
+            },
+        });
+    }
 }
