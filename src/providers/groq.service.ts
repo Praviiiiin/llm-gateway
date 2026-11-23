@@ -16,4 +16,22 @@ export class GroqService {
             apiKey: apiKey,
         })
     }
+
+    async generateResponse(prompt: string) {
+        const completion = await this.groq.chat.completions.create({
+            messages: [
+                {
+                    role: 'user',
+                    content: prompt
+                },
+            ],
+            model: 'llama-3.3-70b-versatile'
+        });
+
+        return {
+            response: completion.choices[0].message.content,
+            model: completion.model,
+            usage: completion.usage,
+        };
+    }
 }
