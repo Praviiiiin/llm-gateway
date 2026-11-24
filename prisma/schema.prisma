@@ -35,13 +35,16 @@ enum ProviderStatus {
 }
 
 model LlmProvider {
-  id             String         @id @default(cuid())
-  name           String         @unique
-  baseUrl        String?
-  status         ProviderStatus @default(ACTIVE)
-  createdAt      DateTime       @default(now())
-  requests       LlmRequest[]   @relation("RequestProvider")
-  cachedRequests LlmRequest[]   @relation("CachedProvider")
+  id                String               @id @default(cuid())
+  name              String               @unique
+  baseUrl           String?
+  status            ProviderStatus       @default(ACTIVE)
+  healthStatus      ProviderHealthStatus @default(UNKNOWN)
+  lastHealthCheckAt DateTime?
+  lastHealthError   String?
+  createdAt         DateTime             @default(now())
+  requests          LlmRequest[]         @relation("RequestProvider")
+  cachedRequests    LlmRequest[]         @relation("CachedProvider")
 }
 
 enum RequestStatus {
@@ -81,4 +84,10 @@ model LlmRequest {
   @@index([providerId])
   @@index([status])
   @@index([createdAt])
+}
+
+enum ProviderHealthStatus {
+  UNKNOWN
+  HEALTHY
+  UNHEALTHY
 }
