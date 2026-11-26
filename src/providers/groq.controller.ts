@@ -3,19 +3,24 @@ import { GroqService } from './groq.service';
 import { generateResponseDto } from '../llm-requests/dto/generate-response.dto';
 import { LlmRequestsService } from '../llm-requests/llm-requests.service';
 import { FinalRequestStatus } from 'src/llm-requests/dto/update-llm-request.dto';
+import { ProviderHealthService } from './provider-health.service';
 
 @Controller('providers/groq')
 export class GroqController {
   constructor(
     private readonly groqService: GroqService,
     private readonly llmRequestsService: LlmRequestsService,
+    private readonly providerHealthService: ProviderHealthService,
   ) {}
 
   @Post('generate')
   async generate(@Body() body: generateResponseDto) {
     const model = 'openai/gpt-oss-120b';
 
-    const request = await this.llmRequestsService.createPendingRequest(model);
+    const request = await this.llmRequestsService.createPendingRequest(
+      model,
+      'groq-provider-001'
+    );
 
     const startTime = Date.now();
 
@@ -31,7 +36,10 @@ export class GroqController {
         latencyMs,
       });
 
-      return result;
+      return {
+        requestId: request.id,
+        ...result,
+      };
     } catch (error) {
       const latencyMs = Date.now() - startTime;
 
@@ -43,5 +51,10 @@ export class GroqController {
 
       throw error;
     }
+  }
+
+  @Post('health-check')
+  checkHealth() {
+    return this.providerHealthService.checkGroqHealth();
   }
 }
