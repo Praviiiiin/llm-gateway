@@ -6,10 +6,11 @@ import { UpdateLlmRequestDto } from './dto/update-llm-request.dto';
 export class LlmRequestsService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async createPendingRequest(model: string) {
+    async createPendingRequest(model: string, providerId: string) {
         return this.prisma.llmRequest.create({
             data: {
                 model: model,
+                providerId,
                 status: 'PENDING',
             },
         });
