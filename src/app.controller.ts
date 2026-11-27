@@ -18,7 +18,7 @@ export class AppController {
 
   @Post('llm-requests')
   createRequest(@Body() body: CreateLlmRequestDto) {
-    return this.llmRequestsService.createPendingRequest(body.model);
+    return this.llmRequestsService.createPendingRequest(body.model, 'grok-provider-001');
   }
 
   @Patch('llm-requests/:id')
