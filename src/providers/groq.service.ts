@@ -25,7 +25,7 @@ export class GroqService {
                     content: prompt
                 },
             ],
-            model: 'llama-3.3-70b-versatile'
+            model: 'openai/gpt-oss-120b',
         });
 
         return {
@@ -33,5 +33,14 @@ export class GroqService {
             model: completion.model,
             usage: completion.usage,
         };
+    }
+
+    async checkHealth(): Promise<boolean> {
+        try{
+            await this.groq.models.list();
+            return true;
+        } catch {
+            return false;
+        }
     }
 }
